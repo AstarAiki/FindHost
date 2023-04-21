@@ -1,0 +1,32 @@
+C1811SIGNAL:
+  device_type: cisco_ios
+  ip: 10.100.0.194
+C1841POBEDA:
+  device_type: cisco_ios
+  ip: 10.100.0.137
+LEVEL:
+  C1811SIGNAL: R
+  C1841POBEDA: R
+  VRES-s5731-1: L3
+  VRES-s5731-2: L3
+  rt3560-1: L2
+  rt3560-2: L2
+VRES-s5731-1:
+  device_type: huawei
+  ip: 10.100.0.49
+VRES-s5731-2:
+  device_type: huawei
+  ip: 10.100.0.50
+rt3560-1:
+  device_type: cisco_ios
+  ip: 10.100.0.1
+rt3560-2:
+  device_type: cisco_ios
+  ip: 10.100.0.2
+SEGMENT:
+  C1811SIGNAL: PRES
+  C1841POBEDA: NES-KIRPICH
+  VRES-s5731-1: VRES
+  VRES-s5731-2: VRES
+  rt3560-1: RPB
+  rt3560-2: RPB
