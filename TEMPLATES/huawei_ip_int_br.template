@@ -1,0 +1,7 @@
+Value INTF (\S+)
+Value ADDR (\S+)
+Value STATUS (up|down|\*down)
+Value PROTO (up|up(s)|down)
+
+Start
+  ^${INTF}\s+${ADDR}/\d+\s+${STATUS}\s+${PROTO} -> Record
