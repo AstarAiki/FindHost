@@ -23,7 +23,7 @@ def findchain(myactivka, m, hostname = False):
     mac_to_find = m[1]
     correct_ip = m[0]
     if hostname:
-        return_text = [f'host {hostname}, ip address: {correct_ip}, mac address: {mac_to_find}\search starting point: {m[3]} go through port: {m[2]}']
+        return_text = [f'host {hostname}, ip address: {correct_ip}, mac address: {mac_to_find}\nsearch starting point: {m[3]} go through port: {m[2]}']
     else:
         return_text = [f'ip address: {correct_ip}, mac address: {mac_to_find}\search starting point: {m[3]} go through port: {m[2]}']
     print(return_text[0])
@@ -86,7 +86,8 @@ def findbymac(myactivka, mac_to_find, devices):
         m = find_router_to_start(myactivka, mac_to_find, is_mac = True, router = rt)
         #print(f'DEBUG m = {m}')
         if m:
-            out = findchain(myactivka, m)
+            hostname = nslookup(m[0], reverse = False)
+            out = findchain(myactivka, m, hostname)
             if out[-1]:
                 return out[0]
     switches = [sw for sw in devices if myactivka.levels[sw] == 'L2' or myactivka.levels[sw] == 'L3']
@@ -218,7 +219,7 @@ if __name__ == "__main__":
             out = ip_routine(myactivka, ip)
             repeat_out.append(out)
         else:
-            out = mac_routine(myactivka,ip)
+            out = mac_routine(myactivka,is_mac)
             repeat_out.append(out)
         if not args.repeat:
             if args.file_to_save:

@@ -28,12 +28,12 @@ class StartOptions:
         for key in d.keys():
             setattr(self, key, d[key])
 
-myini = StartOptions('d:/tools/fh.ini')    
+myini = StartOptions('fh.ini')    
 
 
 def send_config_by_one(device, commands, log=False):
     '''
-    The function connects via SSH (using net log=log=mikko) to ONE device and performs
+    The function connects via SSH (using net mikko) to ONE device and performs
      a list of commands in configuration mode based on the arguments passed.
     '''
     from netmiko import (
@@ -64,7 +64,7 @@ def send_config_by_one(device, commands, log=False):
     except (NetmikoTimeoutException, NetmikoAuthenticationException) as error:
         logging.warning(error)
 
-def send_config_commands(device, commands, log=False):
+def send_config_commands(device, commands, log=True):
     '''
     The function connects via SSH (using netmikko) to ONE device and performs 
     a list of commands in configuration mode based on the arguments passed.
@@ -92,7 +92,7 @@ def send_config_commands(device, commands, log=False):
 
 
 
-def send_show_command(device, commands, log=False):
+def send_show_command(device, commands, log=True):
     '''
    The function connects via SSH (using netmiko) to ONE device
     and executes the specified command.
@@ -329,9 +329,9 @@ class Activka:
     The class represents all our network devices - routers and switches
     '''
     def __init__(self, byname, byip):
-        username = 'username1'
-        userpoint = 'username2'  
-        password = 'password'  
+        username = 'starkova'
+        userpoint = 'astar'  
+        password = 'Mitlun@K123'  
         with open(myini.localpath + byname) as fyaml:
             wholedict = yaml.safe_load(fyaml)
         with open(myini.localpath + byip) as fyaml:
