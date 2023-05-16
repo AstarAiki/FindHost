@@ -11,7 +11,6 @@ from net_func import (
     )
 
 
-
 def findchain(myactivka, m, hostname = False):
     '''
     Function get object Activka and mac address and return
@@ -23,9 +22,9 @@ def findchain(myactivka, m, hostname = False):
     mac_to_find = m[1]
     correct_ip = m[0]
     if hostname:
-        return_text = [f'host {hostname}, ip address: {correct_ip}, mac address: {mac_to_find}\nsearch starting point: {m[3]} go through port: {m[2]}']
+        return_text = [message[20].format(hostname, correct_ip, mac_to_find, m[3], m[2])]
     else:
-        return_text = [f'ip address: {correct_ip}, mac address: {mac_to_find}\search starting point: {m[3]} go through port: {m[2]}']
+        return_text = [message[21].format(correct_ip, mac_to_find, m[3], m[2])]
     print(return_text[0])
     #теперь нам необходимо узнать  тип активки ‘R’ - маршрутизатор ‘L3’ - L3 коммутатор или ‘CH’ checkpoint это необходимо чтобы понять где начинать поиск по таблице MAC адресов (на роутере бессмысленно, надо добраться до первого коммутатора в цепочке
     if not myactivka.levels[m[3]] == 'CH':
@@ -55,18 +54,18 @@ def findchain(myactivka, m, hostname = False):
         mac_to_find = convert_mac(mac_to_find, myactivka.choose(sw, withoutname = True)['device_type'])
         port = myactivka.getinfo(sw, 'mac_address_table',  mac_to_find)
         #port = [имя порта, Status] где Status = True если к порту подключен 1 MAC или если больше то это MAC IP телефона и Status = False если дальше светится много MACов
-        print(f'next device: {sw} port: {port[0]}')
-        return_text.append(f'next device: {sw} port: {port[0]}')
+        print(message[22].format(sw, port[0]))
+        return_text.append(message[22].format(sw, port[0]))
         if not port[1]:
             next_neighbor = myactivka.getinfo(sw, 'neighbor_by_port', port[0])
             #если за портом много устройств но ни по CDP ни по LLDP соседа не получаем, значит там “тупой” неуправляемый коммутатор, останавливаемся и сообщаем об этом
             if not next_neighbor :
-                return_text.append(f'connected to an unmanaged switch in switch: {sw}, port: {port[0]}')
+                return_text.append(message[23].format(sw, port[0]))
                 break
             else:
                 sw = next_neighbor 
         else:
-            return_text.append(f'connected to the switch: {sw}, port: {port[0]}')
+            return_text.append(message[24].format(sw, port[0]))
             break
     print(return_text[-1])
     out = return_text + end
@@ -91,16 +90,16 @@ def findbymac(myactivka, mac_to_find, devices):
             if out[-1]:
                 return out[0]
     switches = [sw for sw in devices if myactivka.levels[sw] == 'L2' or myactivka.levels[sw] == 'L3']
-    print(f'the device with the MAC address {mac_to_find} apparently does not have an IP address')
+    print(message[16].format(mac_to_find))
     for sw in switches:
-        print(f' Starting to search on the switch {sw}')
+        print(message[17].format(sw))
         mac_to_find = convert_mac(mac_to_find, myactivka.choose(sw, withoutname = True)['device_type'])
         port = myactivka.getinfo(sw, 'mac_address_table',  mac_to_find)
         if port:
-            return_text.append(f'a device with a MAC address: {mac_to_find} either does not have an IP address or its address is not routed\n is included in the switch {sw} to the port: {port[0]}')
+            return_text.append(message[18].format(mac_to_find, sw, port[0]))
             print(return_text[0])
             return return_text
-    return_text.append(f'device with MAC address: {mac_to_find} not found in this network segment')
+    return_text.append(message[19].format(mac_to_find))
     print(return_text[0])
     return return_text       
 
@@ -127,9 +126,9 @@ def find_router_to_start(myactivka, ip, is_mac = False, router = None):
         routerstart = router
     out = myactivka.getinfo(routerstart, 'arp', ip)
     if is_mac:
-        print_string = f'looking for a host with a MAC address {ip} on the router {routerstart}'
+        print_string = message[14].format(ip, routerstart)
     else:
-        print_string = f' Or for some reason I can\'t connect to the starting point of the search {routerstart}\or most likely the host {ip} is not online'
+        print_string = message[15].format(routerstart, ip )
      
     if not out:
         print(print_string)
@@ -147,7 +146,7 @@ def ip_routine(myactivka,ip):
     if not re.match(r'[,|\.]', ip):
         ipreal = nslookup(ip)
         if not ipreal:
-            print(f'host {ip} won\'t resolve, I can\'t find it')
+            print(message[10].format(ip))
             quit()
         else:
             correct_ip = ipreal
@@ -156,16 +155,16 @@ def ip_routine(myactivka,ip):
         #а вдруг команду old_fh.exe вызвали из буфера а адрес ввели при русской раскладке и вместо “.” у вас “,” или просто ошиблись - проверяем и возвращаем правильный IP
         correct_ip = is_ip_correct(ip)
         if not correct_ip:
-            print('You entered the wrong IP address, check and repeat')
+            print(message[11])
             quit()
         #а если ввели IP не плохо бы узнать DNS имя
         hostname = nslookup(correct_ip, reverse = False)
         if not hostname:
-            hostname = '(missing in DNS)'
+            hostname = message[12]
     #по IP получаем список  m = [IP, MAC, порт на котором светится, имя активки]
     m = find_router_to_start(myactivka, correct_ip)
     if not m:
-        print('Maybe it\'s a p2p network address between activka, or an address outside our network')
+        print(message[13])
         quit()
     out = findchain(myactivka, m, hostname)
     return out
@@ -176,15 +175,15 @@ def mac_routine(myactivka,ip):
     segment_list = list(myactivka.segment.values())
     sl = sorted(set(segment_list))
     sl_len = [x for x in range(0, len(sl))]
-    print(f'Specify in which segment this MAC address is located')
+    print(message[7])
     for a, b in zip(sl_len,sl):
         print(a,b)
-    seg = input('Select a network segment from the list: ')
+    seg = input(message[8])
     seg_name = sl[int(seg)]
     seg_devices = [dev for dev, value in myactivka.segment.items() if value == seg_name ]
     out = findbymac(myactivka, ip, seg_devices)
     if not out:
-        print('this MAC address was not found in the network segment {seg_name}')
+        print(message[9].format(seg_name))
         return False
     else:
         return out[0]
@@ -193,12 +192,14 @@ def mac_routine(myactivka,ip):
 
 if __name__ == "__main__":
     
- 
-    parser = argparse.ArgumentParser(description='Find host by ip/mac/name')
-    parser.add_argument( dest="ip", help = 'IP or MAC address of host or hostname without domain name')
-    parser.add_argument('-s', dest='seg', default='RPB', help = 'Network segment by name from active_by name.yaml , to stop enter "q", used only when specifying the MAC address')
-    parser.add_argument("-r", dest="repeat", default=False, type=bool, help = 'repeat for many addresses, programm will ask next, must be set to True')
-    parser.add_argument("-f", dest="file_to_save", help = 'save output to file')
+    file = myini.localpath + 'messages_' + myini.language + '.yaml'
+    with open(file, encoding='utf8') as f:
+        message = yaml.safe_load(f)
+    parser = argparse.ArgumentParser(description=message[2])
+    parser.add_argument( dest="ip", help = message[3])
+    parser.add_argument('-s', dest='seg', default='RPB', help = message[4])
+    parser.add_argument("-r", dest="repeat", default=False, type=bool, help = message[5])
+    parser.add_argument("-f", dest="file_to_save", help = message[6])
     args = parser.parse_args()
 
     
@@ -209,9 +210,9 @@ if __name__ == "__main__":
     except IndexError:
         ip = ''
         while not ip:
-            ip = input('Input address: ')
+            ip = input(message[0])
 
-    print('Start to work. Please wait...')
+    print(message[1])
     myactivka = Activka('activka_byname.yaml', 'activka_byip.yaml')
     is_mac = convert_mac(ip,'cisco_ios')
     repeat_out = []
@@ -231,7 +232,7 @@ if __name__ == "__main__":
             else:
                 break
         else:
-            ip = input('Input address: ')
+            ip = input(message[0])
             if ip == 'q':
                 if args.file_to_save:
                     repeat_out = '\n'.join(repeat_out[0])                       
