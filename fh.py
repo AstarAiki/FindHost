@@ -174,7 +174,7 @@ def ip_routine(myactivka,ip):
 def mac_routine(myactivka,ip):
     global progmessages
     segment_list = list(myactivka.segment.values())
-    sl = list(set(segment_list))
+    sl = sorted(set(segment_list))
     sl_len = [x for x in range(0, len(sl))]
     print(f'Specify in which segment this MAC address is located')
     for a, b in zip(sl_len,sl):
@@ -192,7 +192,8 @@ def mac_routine(myactivka,ip):
 
 
 if __name__ == "__main__":
-
+    
+ 
     parser = argparse.ArgumentParser(description='Find host by ip/mac/name')
     parser.add_argument( dest="ip", help = 'IP or MAC address of host or hostname without domain name')
     parser.add_argument('-s', dest='seg', default='RPB', help = 'Network segment by name from active_by name.yaml , to stop enter "q", used only when specifying the MAC address')
@@ -210,7 +211,7 @@ if __name__ == "__main__":
         while not ip:
             ip = input('Input address: ')
 
-
+    print('Start to work. Please wait...')
     myactivka = Activka('activka_byname.yaml', 'activka_byip.yaml')
     is_mac = convert_mac(ip,'cisco_ios')
     repeat_out = []

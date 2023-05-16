@@ -92,7 +92,7 @@ def send_config_commands(device, commands, log=True):
 
 
 
-def send_show_command(device, commands, log=True):
+def send_show_command(device, commands, log=False):
     '''
    The function connects via SSH (using netmiko) to ONE device
     and executes the specified command.
@@ -226,6 +226,7 @@ def convert_mac(mac,device_type):
     Returns the MAC string in the form accepted on this hardware
     MAC can be in the form of 4 by 3 or 6 by 2 separators are also different
     '''
+    mac = mac.lower()
     delimeters = {'cisco_ios':'.','huawei':'-', 'win':':','catos':'-'}
     trudelim = delimeters[device_type]
     p4=re.compile(r'(?P<oct1>[0-9a-fA-F]{4})[-|.|:](?P<oct2>[0-9a-fA-F]{4})[-|.|:](?P<oct3>[0-9a-fA-F]{4})', re.ASCII)
