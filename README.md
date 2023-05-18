@@ -1,4 +1,5 @@
 # FindHost
+English:
 fh.py - (find host) The script searches your local network for a host specified by IP or MAC address, or host name without specifying a domain.
 Detailed help is available at fh -h
 
@@ -29,10 +30,7 @@ for fh.py in this case, in the function Activka.getinfo() you need to add to the
 activka_byip.yaml - Dictionary of all IP addresses and names of devices. It is not used in the Activka class yet, but I have some ideas and it may be useful. It was obtained by me using already written Activka class with passing through all devices and parsing command (show ip int brief/display ip int)
 
 
-
-
-
-
+Russian:
 fh.py - (find host) Скрипт ищет в вашей локальной сети хост, указанный по IP или по MAC адресу, или имени хоста без указания домена.
 Подробная справка доступна по fh -h
 
@@ -43,11 +41,11 @@ net_func.py библиотека функций, используемая для
 fh.ini - файл настроек для скрипта fh в формате YAML. Этот формат прост и интуитивно понятен даже для ручного ввода и легко читается питоном
 
 Пример:
-	localpath: C:/ForWork/ 				- расположение всех файлов
-	phone_mac: 							- список начальных октетов IP телефонов, необходим чтобы определить на порту коммутатора больше одного MAC это телефон или  коммутатор
+	localpath: C:/ForWork/ 		- расположение всех файлов
+	phone_mac: 		- список начальных октетов IP телефонов, необходим чтобы определить на порту коммутатора больше одного MAC это телефон или  коммутатор
 	- 805e
 	templpath: C:/ForWork/TEMPLATES/	- расположение шаблонов textFSM
-	language: 'ru'						- язык сообщений программы, сделаны 'ru' русский и 'en' английский
+	language: 'ru'		- язык сообщений программы, сделаны 'ru' русский и 'en' английский
 
 messages_en.yaml, messages_ru.yaml - языковые файлы для сообщений программы
 
