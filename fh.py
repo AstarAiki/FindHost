@@ -10,6 +10,7 @@ from net_func import (
     myini,
     )
 
+message = dict()
 
 def findchain(myactivka, m, hostname = False):
     '''
@@ -17,11 +18,13 @@ def findchain(myactivka, m, hostname = False):
     name of switch, port, IP and hostname if possible where
     host with that mac 
     '''
+    global message
     end = []
     i = 0
     mac_to_find = m[1]
     correct_ip = m[0]
     if hostname:
+        print(f'DEBUG hostname = {hostname}\nmessage[20] = {message[20]}')
         return_text = [message[20].format(hostname, correct_ip, mac_to_find, m[3], m[2])]
     else:
         return_text = [message[21].format(correct_ip, mac_to_find, m[3], m[2])]
@@ -79,6 +82,7 @@ def findbymac(myactivka, mac_to_find, devices):
     and return name of switch, port, IP and hostname if possible where
     host with that mac 
     '''
+    global message
     return_text = []
     routers = [rt for rt in devices if myactivka.levels[rt] == 'R' or myactivka.levels[rt] == 'L3']
     for rt in routers:
@@ -111,6 +115,7 @@ def find_router_to_start(myactivka, ip, is_mac = False, router = None):
     and return list(IP,MAC, port_where_was _found, name_of_router)
     '''
     #ищу 3-й октет адреса и по нему из файла networks_byip.yaml получаю имя роутера (стартовой точки поиска)
+    global message
     if not is_mac:
         ia = re.compile(r'(?P<OCT1>\d+)\.(?P<OCT2>\d+)\.(?P<OCT3>\d+)\.(?P<OCT4>\d+)', re.ASCII)
         m = ia.search(ip)
@@ -143,6 +148,7 @@ def find_router_to_start(myactivka, ip, is_mac = False, router = None):
 
 
 def ip_routine(myactivka,ip):
+    global message
     if not re.match(r'[,|\.]', ip):
         ipreal = nslookup(ip)
         if not ipreal:
@@ -171,7 +177,7 @@ def ip_routine(myactivka,ip):
 
     
 def mac_routine(myactivka,ip):
-    global progmessages
+    global message
     segment_list = list(myactivka.segment.values())
     sl = sorted(set(segment_list))
     sl_len = [x for x in range(0, len(sl))]
